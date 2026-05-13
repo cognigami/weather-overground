@@ -1,0 +1,45 @@
+2026/05/12 19:51:09 ── Las Condes (-33.4130, -70.5730)
+2026/05/12 19:51:10   [IQAir] ERROR: HTTP 403: {"status":"fail","data":{"message":"Forbidden"}}
+2026/05/12 19:51:11   [Tomorrow.io] ERROR: HTTP 401: {"code":401001,"type":"Invalid Auth","message":"The method requires authentication but it was not presented or is invalid."}
+2026/05/12 19:51:11   [Open-Meteo/CAMS] OK
+2026/05/12 19:51:11 ── Lastarria (-33.4390, -70.6400)
+2026/05/12 19:51:12   [IQAir] ERROR: HTTP 403: {"status":"fail","data":{"message":"Forbidden"}}
+2026/05/12 19:51:12   [Tomorrow.io] ERROR: HTTP 401: {"code":401001,"type":"Invalid Auth","message":"The method requires authentication but it was not presented or is invalid."}
+2026/05/12 19:51:12   [Open-Meteo/CAMS] OK
+2026/05/12 19:51:12 Done. 2 rows written to ./weather_data.csv.
+2026/05/12 20:32:10 ── Las Condes (-33.4130, -70.5730)
+2026/05/12 20:32:12   [IQAir] ERROR: HTTP 403: {"status":"fail","data":{"message":"Forbidden"}}
+2026/05/12 20:32:12   [Tomorrow.io] OK
+2026/05/12 20:32:13   [Open-Meteo/CAMS] OK
+2026/05/12 20:32:13 ── Lastarria (-33.4390, -70.6400)
+2026/05/12 20:32:13   [IQAir] ERROR: HTTP 403: {"status":"fail","data":{"message":"Forbidden"}}
+2026/05/12 20:32:13   [Tomorrow.io] OK
+2026/05/12 20:32:13   [Open-Meteo/CAMS] OK
+2026/05/12 20:32:13 Done. 4 rows written to ./weather_data.csv.
+2026/05/13 16:53:04 ── Las Condes (-33.4130, -70.5730)
+2026/05/13 16:53:05   [IQAir] OK
+2026/05/13 16:53:05   [Tomorrow.io] OK
+2026/05/13 16:53:06   [Open-Meteo/CAMS] OK
+2026/05/13 16:53:06 ── Lastarria (-33.4390, -70.6400)
+2026/05/13 16:53:06   [IQAir] OK
+2026/05/13 16:53:06   [Tomorrow.io] OK
+2026/05/13 16:53:07   [Open-Meteo/CAMS] OK
+2026/05/13 16:53:07 Done. 6 rows written to ./weather_data.csv.
+2026/05/13 19:29:55 ── Las Condes (-33.4130, -70.5730)
+2026/05/13 19:29:56   [IQAir] OK
+2026/05/13 19:29:56   [Tomorrow.io] OK
+2026/05/13 19:29:57   [Open-Meteo/CAMS] OK
+2026/05/13 19:29:57 ── Lastarria (-33.4390, -70.6400)
+2026/05/13 19:29:57   [IQAir] OK
+2026/05/13 19:29:57   [Tomorrow.io] OK
+2026/05/13 19:29:57   [Open-Meteo/CAMS] OK
+2026/05/13 19:29:57 Done. 6 rows written to ./weather_data.csv.
+2026/05/13 19:36:37 ── Las Condes (-33.4130, -70.5730)
+2026/05/13 19:36:38   [IQAir] OK
+2026/05/13 19:36:38   [Tomorrow.io] OK
+2026/05/13 19:36:39   [Open-Meteo/CAMS] OK
+2026/05/13 19:36:39 ── Lastarria (-33.4390, -70.6400)
+2026/05/13 19:36:40   [IQAir] OK
+2026/05/13 19:36:40   [Tomorrow.io] OK
+2026/05/13 19:36:40   [Open-Meteo/CAMS] OK
+2026/05/13 19:36:40 Done. 6 rows written to ./weather_data.csv.

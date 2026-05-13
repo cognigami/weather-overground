@@ -1,0 +1,13 @@
+{
+  "storage": {
+    "path": "./weather_data.csv"
+  },
+  "api_keys": {
+    "tomorrow_io": "",
+    "iqair": ""
+  },
+  "locations": [
+    { "name": "Las Condes", "lat": -33.413, "lon": -70.573 },
+    { "name": "Lastarria",  "lat": -33.439, "lon": -70.640 }
+  ]
+}
