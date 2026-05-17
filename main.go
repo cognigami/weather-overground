@@ -1,6 +1,6 @@
-// weather-overground: hybrid Weather & AQI data collector.
+// weather-collector: hybrid Weather & AQI data collector.
 // Sources: IQAir (station), Tomorrow.io (1 km model), Open-Meteo (CAMS baseline).
-// Config: JSON.  Storage: append-only CSV.  No external dependencies.
+// Config: JSON.  Storage: one append-only CSV per source.  No external dependencies.
 package main
 
 import (
@@ -13,6 +13,8 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"path/filepath"
+	"strings"
 	"strconv"
 	"time"
 )
@@ -29,11 +31,12 @@ type Location struct {
 
 type Config struct {
 	Storage struct {
-		Path string `json:"path"`
+		Dir string `json:"dir"`
 	} `json:"storage"`
 	APIKeys struct {
 		TomorrowIO string `json:"tomorrow_io"`
 		IQAir      string `json:"iqair"`
+		OpenAQ     string `json:"openaq"`
 	} `json:"api_keys"`
 	Locations []Location `json:"locations"`
 }
@@ -49,8 +52,8 @@ func loadConfig(path string) (Config, error) {
 	if err := json.NewDecoder(f).Decode(&cfg); err != nil {
 		return Config{}, fmt.Errorf("parse config: %w", err)
 	}
-	if cfg.Storage.Path == "" {
-		cfg.Storage.Path = "./weather_data.csv"
+	if cfg.Storage.Dir == "" {
+		cfg.Storage.Dir = "./data"
 	}
 	return cfg, nil
 }
@@ -85,21 +88,44 @@ func getJSON(rawURL string, params map[string]string, dest any) error {
 	return json.Unmarshal(body, dest)
 }
 
+func getJSONWithHeaders(rawURL string, params map[string]string, headers map[string]string, dest any) error {
+	u, err := url.Parse(rawURL)
+	if err != nil {
+		return err
+	}
+	q := u.Query()
+	for k, v := range params {
+		q.Set(k, v)
+	}
+	u.RawQuery = q.Encode()
+
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return err
+	}
+	for k, v := range headers {
+		req.Header.Set(k, v)
+	}
+
+	resp, err := httpClient.Do(req)
+	if err != nil {
+		return fmt.Errorf("HTTP GET: %w", err)
+	}
+	defer resp.Body.Close()
+
+	body, _ := io.ReadAll(resp.Body)
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("HTTP %d: %s", resp.StatusCode, body)
+	}
+	return json.Unmarshal(body, dest)
+}
+
 // ---------------------------------------------------------------------------
-// Row: the normalised output type
+// Shared helpers
 // ---------------------------------------------------------------------------
 
-type Row struct {
-	TimestampUTC string
-	LocationName string
-	Source       string
-	PM25         *float64
-	PM10         *float64
-	O3           *float64
-	Temp         *float64
-	Humidity     *float64
-	PollenTree   *float64
-}
+func ptrF(f float64) *float64 { return &f }
+func ptrI(i int) *int         { return &i }
 
 func fmtF(f *float64) string {
 	if f == nil {
@@ -108,32 +134,71 @@ func fmtF(f *float64) string {
 	return strconv.FormatFloat(*f, 'f', 4, 64)
 }
 
-func (r Row) ToCSV() []string {
-	return []string{
-		r.TimestampUTC,
-		r.LocationName,
-		r.Source,
-		fmtF(r.PM25),
-		fmtF(r.PM10),
-		fmtF(r.O3),
-		fmtF(r.Temp),
-		fmtF(r.Humidity),
-		fmtF(r.PollenTree),
+func fmtI(i *int) string {
+	if i == nil {
+		return ""
 	}
+	return strconv.Itoa(*i)
 }
 
-var csvHeader = []string{
-	"timestamp_utc", "location_name", "source",
-	"pm25", "pm10", "o3", "temp", "humidity", "pollen_tree",
-}
+// ---------------------------------------------------------------------------
+// CSV writer
+// ---------------------------------------------------------------------------
 
-func ptr(f float64) *float64 { return &f }
+// appendCSV opens (or creates) a CSV at path and appends rows to it.
+// The header is written only on first creation.
+func appendCSV(path string, header []string, rows [][]string) error {
+	fileExists := true
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		fileExists = false
+	}
+
+	f, err := os.OpenFile(path, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		return fmt.Errorf("open %s: %w", path, err)
+	}
+	defer f.Close()
+
+	w := csv.NewWriter(f)
+	if !fileExists {
+		if err := w.Write(header); err != nil {
+			return err
+		}
+	}
+	for _, row := range rows {
+		if err := w.Write(row); err != nil {
+			return err
+		}
+	}
+	w.Flush()
+	return w.Error()
+}
 
 // ---------------------------------------------------------------------------
 // IQAir
 // ---------------------------------------------------------------------------
 
-func fetchIQAir(loc Location, apiKey string) (Row, error) {
+type IQAirRow struct {
+	TimestampUTC string
+	LocationName string
+	AQIUS        *int
+	Temp         *float64
+	Humidity     *float64
+}
+
+var iqairHeader = []string{
+	"timestamp_utc", "location_name",
+	"aqi_us", "temp_c", "humidity_pct",
+}
+
+func (r IQAirRow) toCSV() []string {
+	return []string{
+		r.TimestampUTC, r.LocationName,
+		fmtI(r.AQIUS), fmtF(r.Temp), fmtF(r.Humidity),
+	}
+}
+
+func fetchIQAir(loc Location, apiKey string) (IQAirRow, error) {
 	var result struct {
 		Data struct {
 			Current struct {
@@ -154,15 +219,14 @@ func fetchIQAir(loc Location, apiKey string) (Row, error) {
 		"key": apiKey,
 	}, &result)
 	if err != nil {
-		return Row{}, err
+		return IQAirRow{}, err
 	}
 
-	aqius := float64(result.Data.Current.Pollution.AQIUS)
-	return Row{
-		Source:   "iqair",
-		PM25:     &aqius, // free tier returns US AQI, not raw µg/m³
-		Temp:     ptr(result.Data.Current.Weather.Tp),
-		Humidity: ptr(result.Data.Current.Weather.Hu),
+	c := result.Data.Current
+	return IQAirRow{
+		AQIUS:    ptrI(c.Pollution.AQIUS),
+		Temp:     ptrF(c.Weather.Tp),
+		Humidity: ptrF(c.Weather.Hu),
 	}, nil
 }
 
@@ -170,47 +234,234 @@ func fetchIQAir(loc Location, apiKey string) (Row, error) {
 // Tomorrow.io
 // ---------------------------------------------------------------------------
 
-func fetchTomorrow(loc Location, apiKey string) (Row, error) {
+type TomorrowRow struct {
+	TimestampUTC string
+	LocationName string
+	Temp         *float64
+	TempApparent *float64
+	Humidity     *float64
+	WindSpeed    *float64
+	WindDir      *float64
+	Pressure     *float64
+	Rain         *float64
+	UVIndex      *float64
+}
+
+var tomorrowHeader = []string{
+	"timestamp_utc", "location_name",
+	"temp_c", "temp_apparent_c", "humidity_pct",
+	"wind_speed_ms", "wind_dir_deg", "pressure_hpa",
+	"rain_mm", "uv_index",
+}
+
+func (r TomorrowRow) toCSV() []string {
+	return []string{
+		r.TimestampUTC, r.LocationName,
+		fmtF(r.Temp), fmtF(r.TempApparent), fmtF(r.Humidity),
+		fmtF(r.WindSpeed), fmtF(r.WindDir), fmtF(r.Pressure),
+		fmtF(r.Rain), fmtF(r.UVIndex),
+	}
+}
+
+func fetchTomorrow(loc Location, apiKey string) (TomorrowRow, error) {
 	var result struct {
 		Data struct {
 			Values struct {
-				PM25       float64 `json:"particulateMatter25"`
-				PM10       float64 `json:"particulateMatter10"`
-				O3         float64 `json:"pollutantO3"`
-				Temp       float64 `json:"temperature"`
-				Humidity   float64 `json:"humidity"`
-				PollenTree float64 `json:"treeIndex"`
+				Temp         float64 `json:"temperature"`
+				TempAppar    float64 `json:"temperatureApparent"`
+				Humidity     float64 `json:"humidity"`
+				WindSpeed    float64 `json:"windSpeed"`
+				WindDir      float64 `json:"windDirection"`
+				Pressure     float64 `json:"pressureSurfaceLevel"`
+				Rain         float64 `json:"rainAccumulation"`
+				UVIndex      float64 `json:"uvIndex"`
 			} `json:"values"`
 		} `json:"data"`
 	}
 
 	err := getJSON("https://api.tomorrow.io/v4/weather/realtime", map[string]string{
 		"location": fmt.Sprintf("%f,%f", loc.Lat, loc.Lon),
-		"fields":   "particulateMatter25,particulateMatter10,pollutantO3,temperature,humidity,treeIndex",
+		"fields":   "temperature,temperatureApparent,humidity,windSpeed,windDirection,pressureSurfaceLevel,rainAccumulation,uvIndex",
 		"units":    "metric",
 		"apikey":   apiKey,
 	}, &result)
 	if err != nil {
-		return Row{}, err
+		return TomorrowRow{}, err
 	}
 
 	v := result.Data.Values
-	return Row{
-		Source:     "tomorrow_io",
-		PM25:       ptr(v.PM25),
-		PM10:       ptr(v.PM10),
-		O3:         ptr(v.O3),
-		Temp:       ptr(v.Temp),
-		Humidity:   ptr(v.Humidity),
-		PollenTree: ptr(v.PollenTree),
+	return TomorrowRow{
+		Temp:         ptrF(v.Temp),
+		TempApparent: ptrF(v.TempAppar),
+		Humidity:     ptrF(v.Humidity),
+		WindSpeed:    ptrF(v.WindSpeed),
+		WindDir:      ptrF(v.WindDir),
+		Pressure:     ptrF(v.Pressure),
+		Rain:         ptrF(v.Rain),
+		UVIndex:      ptrF(v.UVIndex),
 	}, nil
+}
+
+// ---------------------------------------------------------------------------
+// OpenAQ
+// ---------------------------------------------------------------------------
+
+type OpenAQRow struct {
+	TimestampUTC string
+	LocationName string
+	StationName  string
+	PM25         *float64
+	PM10         *float64
+	O3           *float64
+	NO2          *float64
+}
+
+var openAQHeader = []string{
+	"timestamp_utc", "location_name", "station_name",
+	"pm25_ugm3", "pm10_ugm3", "o3_ugm3", "no2_ugm3",
+}
+
+func (r OpenAQRow) toCSV() []string {
+	return []string{
+		r.TimestampUTC, r.LocationName, r.StationName,
+		fmtF(r.PM25), fmtF(r.PM10), fmtF(r.O3), fmtF(r.NO2),
+	}
+}
+
+func fetchOpenAQ(loc Location, apiKey string) (OpenAQRow, error) {
+	headers := map[string]string{"X-API-Key": apiKey}
+
+	// Step 1: Find the nearest station metadata
+	var locResult struct {
+		Results []struct {
+			ID      int    `json:"id"`
+			Name    string `json:"name"`
+			Sensors []struct {
+				ID        int `json:"id"`
+				Parameter struct {
+					Name string `json:"name"`
+				} `json:"parameter"`
+			} `json:"sensors"`
+		} `json:"results"`
+	}
+	err := getJSONWithHeaders(
+		"https://api.openaq.org/v3/locations",
+		map[string]string{
+			"coordinates":   fmt.Sprintf("%f,%f", loc.Lat, loc.Lon),
+			"radius":        "25000",
+			"limit":         "5",
+			"order_by":      "id",
+			"parameters_id": "2", // Must have PM2.5 capability
+		},
+		headers,
+		&locResult,
+	)
+	if err != nil {
+		return OpenAQRow{}, fmt.Errorf("locations lookup: %w", err)
+	}
+	if len(locResult.Results) == 0 {
+		return OpenAQRow{}, fmt.Errorf("no stations found within 25km")
+	}
+
+	station := locResult.Results[0]
+
+	// Dynamically build a map of sensorID -> parameterName from Step 1
+	sensorMap := make(map[int]string)
+	for _, s := range station.Sensors {
+		sensorMap[s.ID] = s.Parameter.Name
+	}
+
+	// Step 2: Get flat latest measurements for that station ID
+	var latest struct {
+		Results []struct {
+			SensorsID int     `json:"sensorsId"`
+			Value     float64 `json:"value"`
+			Datetime  struct {
+				Utc string `json:"utc"`
+			} `json:"datetime"`
+		} `json:"results"`
+	}
+	err = getJSONWithHeaders(
+		fmt.Sprintf("https://api.openaq.org/v3/locations/%d/latest", station.ID),
+		nil,
+		headers,
+		&latest,
+	)
+	if err != nil {
+		return OpenAQRow{}, fmt.Errorf("latest measurements: %w", err)
+	}
+
+	row := OpenAQRow{
+		LocationName: loc.Name, // Pull the configured lookup label
+		StationName:  station.Name,
+	}
+	
+	hasFreshData := false
+
+	for _, m := range latest.Results {
+		// Filter out stale records (like the 2021 anomalies we saw)
+		if !strings.HasPrefix(m.Datetime.Utc, "2026-05") {
+			continue
+		}
+
+		// Identify parameter name using our dynamic look-up map
+		paramName, exists := sensorMap[m.SensorsID]
+		if !exists {
+			continue
+		}
+
+		v := m.Value
+		hasFreshData = true
+		
+		// Map the record timestamp dynamically from the first valid sensor found
+		if row.TimestampUTC == "" {
+			row.TimestampUTC = m.Datetime.Utc
+		}
+
+		switch paramName {
+		case "pm25":
+			row.PM25 = &v
+		case "pm10":
+			row.PM10 = &v
+		case "o3":
+			row.O3 = &v
+		case "no2":
+			row.NO2 = &v
+		}
+	}
+
+	if !hasFreshData {
+		return OpenAQRow{}, fmt.Errorf("station found, but data is completely stale")
+	}
+
+	return row, nil
 }
 
 // ---------------------------------------------------------------------------
 // Open-Meteo (CAMS, no key)
 // ---------------------------------------------------------------------------
 
-func fetchOpenMeteo(loc Location) (Row, error) {
+type OpenMeteoRow struct {
+	TimestampUTC string
+	LocationName string
+	PM25         *float64
+	PM10         *float64
+	O3           *float64
+}
+
+var openMeteoHeader = []string{
+	"timestamp_utc", "location_name",
+	"pm25_ugm3", "pm10_ugm3", "o3_ugm3",
+}
+
+func (r OpenMeteoRow) toCSV() []string {
+	return []string{
+		r.TimestampUTC, r.LocationName,
+		fmtF(r.PM25), fmtF(r.PM10), fmtF(r.O3),
+	}
+}
+
+func fetchOpenMeteo(loc Location) (OpenMeteoRow, error) {
 	var result struct {
 		Current struct {
 			PM25  float64 `json:"pm2_5"`
@@ -226,88 +477,121 @@ func fetchOpenMeteo(loc Location) (Row, error) {
 		"timezone":  "UTC",
 	}, &result)
 	if err != nil {
-		return Row{}, err
+		return OpenMeteoRow{}, err
 	}
 
-	return Row{
-		Source: "open_meteo_cams",
-		PM25:   ptr(result.Current.PM25),
-		PM10:   ptr(result.Current.PM10),
-		O3:     ptr(result.Current.Ozone),
+	return OpenMeteoRow{
+		PM25: ptrF(result.Current.PM25),
+		PM10: ptrF(result.Current.PM10),
+		O3:   ptrF(result.Current.Ozone),
 	}, nil
-}
-
-// ---------------------------------------------------------------------------
-// Persistence
-// ---------------------------------------------------------------------------
-
-func appendCSV(path string, rows []Row) error {
-	fileExists := true
-	if _, err := os.Stat(path); os.IsNotExist(err) {
-		fileExists = false
-	}
-
-	f, err := os.OpenFile(path, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
-	if err != nil {
-		return fmt.Errorf("open csv: %w", err)
-	}
-	defer f.Close()
-
-	w := csv.NewWriter(f)
-	if !fileExists {
-		if err := w.Write(csvHeader); err != nil {
-			return err
-		}
-	}
-	for _, r := range rows {
-		if err := w.Write(r.ToCSV()); err != nil {
-			return err
-		}
-	}
-	w.Flush()
-	return w.Error()
 }
 
 // ---------------------------------------------------------------------------
 // Collection loop
 // ---------------------------------------------------------------------------
 
-func collect(cfg Config, logger *log.Logger) []Row {
-	ts := time.Now().UTC().Format(time.RFC3339)
-	var rows []Row
+type collectionResults struct {
+	iqair     []IQAirRow
+	tomorrow  []TomorrowRow
+	openMeteo []OpenMeteoRow
+	openAQ    []OpenAQRow
+}
 
-	stamp := func(r Row, loc Location) Row {
-		r.TimestampUTC = ts
-		r.LocationName = loc.Name
-		return r
-	}
+func collect(cfg Config, logger *log.Logger) collectionResults {
+	ts := time.Now().UTC().Format(time.RFC3339)
+	var r collectionResults
 
 	for _, loc := range cfg.Locations {
 		logger.Printf("── %s (%.4f, %.4f)", loc.Name, loc.Lat, loc.Lon)
 
-		if r, err := fetchIQAir(loc, cfg.APIKeys.IQAir); err != nil {
+		if row, err := fetchIQAir(loc, cfg.APIKeys.IQAir); err != nil {
 			logger.Printf("  [IQAir] ERROR: %v", err)
 		} else {
-			rows = append(rows, stamp(r, loc))
+			row.TimestampUTC = ts
+			row.LocationName = loc.Name
+			r.iqair = append(r.iqair, row)
 			logger.Printf("  [IQAir] OK")
 		}
 
-		if r, err := fetchTomorrow(loc, cfg.APIKeys.TomorrowIO); err != nil {
+		if row, err := fetchTomorrow(loc, cfg.APIKeys.TomorrowIO); err != nil {
 			logger.Printf("  [Tomorrow.io] ERROR: %v", err)
 		} else {
-			rows = append(rows, stamp(r, loc))
+			row.TimestampUTC = ts
+			row.LocationName = loc.Name
+			r.tomorrow = append(r.tomorrow, row)
 			logger.Printf("  [Tomorrow.io] OK")
 		}
 
-		if r, err := fetchOpenMeteo(loc); err != nil {
+		if row, err := fetchOpenAQ(loc, cfg.APIKeys.OpenAQ); err != nil {
+			logger.Printf("  [OpenAQ] ERROR: %v", err)
+		} else {
+			row.TimestampUTC = ts
+			row.LocationName = loc.Name
+			r.openAQ = append(r.openAQ, row)
+			logger.Printf("  [OpenAQ] OK")
+		}
+
+		if row, err := fetchOpenMeteo(loc); err != nil {
 			logger.Printf("  [Open-Meteo/CAMS] ERROR: %v", err)
 		} else {
-			rows = append(rows, stamp(r, loc))
+			row.TimestampUTC = ts
+			row.LocationName = loc.Name
+			r.openMeteo = append(r.openMeteo, row)
 			logger.Printf("  [Open-Meteo/CAMS] OK")
 		}
 	}
 
-	return rows
+	return r
+}
+
+// ---------------------------------------------------------------------------
+// Persistence
+// ---------------------------------------------------------------------------
+
+func persist(dir string, r collectionResults, logger *log.Logger) {
+	if err := os.MkdirAll(dir, 0755); err != nil {
+		logger.Fatalf("Cannot create data dir %s: %v", dir, err)
+	}
+
+	type writeJob struct {
+		filename string
+		header   []string
+		rows     [][]string
+	}
+
+	var iqairRows, tomorrowRows, openAQRows, openMeteoRows [][]string
+	for _, row := range r.iqair {
+		iqairRows = append(iqairRows, row.toCSV())
+	}
+	for _, row := range r.tomorrow {
+		tomorrowRows = append(tomorrowRows, row.toCSV())
+	}
+	for _, row := range r.openMeteo {
+		openMeteoRows = append(openMeteoRows, row.toCSV())
+	}
+	for _, row := range r.openAQ {
+		openAQRows = append(openAQRows, row.toCSV())
+	}
+
+	jobs := []writeJob{
+		{"iqair.csv", iqairHeader, iqairRows},
+		{"tomorrow.csv", tomorrowHeader, tomorrowRows},
+		{"openmeteo.csv", openMeteoHeader, openMeteoRows},
+		{"openaq.csv", openAQHeader, openAQRows},
+	}
+
+	for _, job := range jobs {
+		if len(job.rows) == 0 {
+			continue
+		}
+		path := filepath.Join(dir, job.filename)
+		if err := appendCSV(path, job.header, job.rows); err != nil {
+			logger.Printf("CSV write error (%s): %v", job.filename, err)
+		} else {
+			logger.Printf("Wrote %d row(s) → %s", len(job.rows), path)
+		}
+	}
 }
 
 // ---------------------------------------------------------------------------
@@ -318,7 +602,6 @@ func main() {
 	configPath := flag.String("config", "config.json", "Path to JSON config file")
 	flag.Parse()
 
-	// Set up file logger (also mirrors to stdout via MultiWriter)
 	logFile, err := os.OpenFile("collector.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "cannot open log file: %v\n", err)
@@ -333,16 +616,8 @@ func main() {
 		logger.Fatalf("Config error: %v", err)
 	}
 
-	rows := collect(cfg, logger)
+	r := collect(cfg, logger)
+	persist(cfg.Storage.Dir, r, logger)
 
-	if len(rows) == 0 {
-		logger.Println("No data collected — nothing written.")
-		return
-	}
-
-	if err := appendCSV(cfg.Storage.Path, rows); err != nil {
-		logger.Fatalf("CSV write error: %v", err)
-	}
-
-	logger.Printf("Done. %d rows written to %s.", len(rows), cfg.Storage.Path)
+	logger.Println("Done.")
 }

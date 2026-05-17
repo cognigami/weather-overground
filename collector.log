@@ -43,3 +43,249 @@
 2026/05/13 19:36:40   [Tomorrow.io] OK
 2026/05/13 19:36:40   [Open-Meteo/CAMS] OK
 2026/05/13 19:36:40 Done. 6 rows written to ./weather_data.csv.
+2026/05/17 16:09:37 ── Las Condes (-33.4130, -70.5730)
+2026/05/17 16:09:38   [IQAir] OK
+2026/05/17 16:09:38   [Tomorrow.io] OK
+2026/05/17 16:09:39   [Open-Meteo/CAMS] OK
+2026/05/17 16:09:39 ── Lastarria (-33.4390, -70.6400)
+2026/05/17 16:09:39   [IQAir] OK
+2026/05/17 16:09:39   [Tomorrow.io] OK
+2026/05/17 16:09:39   [Open-Meteo/CAMS] OK
+2026/05/17 16:09:39 Wrote 2 row(s) → data/iqair.csv
+2026/05/17 16:09:39 Wrote 2 row(s) → data/tomorrow.csv
+2026/05/17 16:09:39 Wrote 2 row(s) → data/openmeteo.csv
+2026/05/17 16:09:39 Done.
+2026/05/25 10:41:30 Config error: parse config: invalid character '}' looking for beginning of object key string
+2026/05/25 10:42:12 ── Las Condes (-33.4130, -70.5730)
+2026/05/25 10:42:13   [IQAir] OK
+2026/05/25 10:42:13   [Tomorrow.io] OK
+2026/05/25 10:42:13   [OpenAQ] ERROR: locations lookup: HTTP 422: "[{'type': 'enum', 'loc': ('query', 'order_by'), 'msg': \"Input should be 'id'\", 'input': 'distance', 'ctx': {'expected': \"'id'\"}}]"
+2026/05/25 10:42:14   [Open-Meteo/CAMS] OK
+2026/05/25 10:42:14 ── Lastarria (-33.4390, -70.6400)
+2026/05/25 10:42:14   [IQAir] OK
+2026/05/25 10:42:14   [Tomorrow.io] OK
+2026/05/25 10:42:14   [OpenAQ] ERROR: locations lookup: HTTP 422: "[{'type': 'enum', 'loc': ('query', 'order_by'), 'msg': \"Input should be 'id'\", 'input': 'distance', 'ctx': {'expected': \"'id'\"}}]"
+2026/05/25 10:42:14   [Open-Meteo/CAMS] OK
+2026/05/25 10:42:14 Wrote 2 row(s) → data/iqair.csv
+2026/05/25 10:42:14 Wrote 2 row(s) → data/tomorrow.csv
+2026/05/25 10:42:14 Wrote 2 row(s) → data/openmeteo.csv
+2026/05/25 10:42:14 Done.
+2026/05/25 10:48:43 ── Las Condes (-33.4130, -70.5730)
+2026/05/25 10:48:44   [IQAir] OK
+2026/05/25 10:48:44   [Tomorrow.io] OK
+2026/05/25 10:48:45   [OpenAQ] ERROR: no stations found within 25km
+2026/05/25 10:48:45   [Open-Meteo/CAMS] OK
+2026/05/25 10:48:45 ── Lastarria (-33.4390, -70.6400)
+2026/05/25 10:48:45   [IQAir] OK
+2026/05/25 10:48:45   [Tomorrow.io] OK
+2026/05/25 10:48:46   [OpenAQ] OK
+2026/05/25 10:48:46   [Open-Meteo/CAMS] OK
+2026/05/25 10:48:46 Wrote 2 row(s) → data/iqair.csv
+2026/05/25 10:48:46 Wrote 2 row(s) → data/tomorrow.csv
+2026/05/25 10:48:46 Wrote 2 row(s) → data/openmeteo.csv
+2026/05/25 10:48:46 Wrote 1 row(s) → data/openaq.csv
+2026/05/25 10:48:46 Done.
+2026/05/25 10:49:40 ── Las Condes (-33.4130, -70.5730)
+2026/05/25 10:49:40   [IQAir] OK
+2026/05/25 10:49:41   [Tomorrow.io] OK
+2026/05/25 10:49:41   [OpenAQ] ERROR: no stations found within 25km
+2026/05/25 10:49:41   [Open-Meteo/CAMS] OK
+2026/05/25 10:49:41 ── Lastarria (-33.4390, -70.6400)
+2026/05/25 10:49:41   [IQAir] OK
+2026/05/25 10:49:41   [Tomorrow.io] OK
+2026/05/25 10:49:42   [OpenAQ] OK
+2026/05/25 10:49:42   [Open-Meteo/CAMS] OK
+2026/05/25 10:49:42 Wrote 2 row(s) → data/iqair.csv
+2026/05/25 10:49:42 Wrote 2 row(s) → data/tomorrow.csv
+2026/05/25 10:49:42 Wrote 2 row(s) → data/openmeteo.csv
+2026/05/25 10:49:42 Wrote 1 row(s) → data/openaq.csv
+2026/05/25 10:49:42 Done.
+2026/05/25 10:51:17 ── Las Condes (-33.4130, -70.5730)
+2026/05/25 10:51:18   [IQAir] OK
+2026/05/25 10:51:18   [Tomorrow.io] OK
+2026/05/25 10:51:18   [OpenAQ] ERROR: no stations found within 25km
+2026/05/25 10:51:19   [Open-Meteo/CAMS] OK
+2026/05/25 10:51:19 ── Lastarria (-33.4390, -70.6400)
+2026/05/25 10:51:19   [IQAir] OK
+2026/05/25 10:51:19   [Tomorrow.io] OK
+2026/05/25 10:51:19   [OpenAQ] OK
+2026/05/25 10:51:20   [Open-Meteo/CAMS] OK
+2026/05/25 10:51:20 Wrote 2 row(s) → data/iqair.csv
+2026/05/25 10:51:20 Wrote 2 row(s) → data/tomorrow.csv
+2026/05/25 10:51:20 Wrote 2 row(s) → data/openmeteo.csv
+2026/05/25 10:51:20 Wrote 1 row(s) → data/openaq.csv
+2026/05/25 10:51:20 Done.
+2026/05/25 10:54:01 ── Las Condes (-33.4130, -70.5730)
+2026/05/25 10:54:02   [IQAir] OK
+2026/05/25 10:54:02   [Tomorrow.io] OK
+2026/05/25 10:54:03   [OpenAQ] ERROR: latest measurements: HTTP 422: {"detail":[{"type":"greater_than_equal","loc":["query","locations_id"],"msg":"Input should be greater than or equal to 1","input":0,"ctx":{"ge":1},"url":"https://errors.pydantic.dev/2.11/v/greater_than_equal"}]}
+2026/05/25 10:54:04   [Open-Meteo/CAMS] OK
+2026/05/25 10:54:04 ── Lastarria (-33.4390, -70.6400)
+2026/05/25 10:54:04   [IQAir] OK
+2026/05/25 10:54:04   [Tomorrow.io] OK
+2026/05/25 10:54:05   [OpenAQ] ERROR: latest measurements: HTTP 422: {"detail":[{"type":"greater_than_equal","loc":["query","locations_id"],"msg":"Input should be greater than or equal to 1","input":0,"ctx":{"ge":1},"url":"https://errors.pydantic.dev/2.11/v/greater_than_equal"}]}
+2026/05/25 10:54:05   [Open-Meteo/CAMS] OK
+2026/05/25 10:54:05 Wrote 2 row(s) → data/iqair.csv
+2026/05/25 10:54:05 Wrote 2 row(s) → data/tomorrow.csv
+2026/05/25 10:54:05 Wrote 2 row(s) → data/openmeteo.csv
+2026/05/25 10:54:05 Done.
+2026/05/25 10:54:59 ── Las Condes (-33.4130, -70.5730)
+2026/05/25 10:54:59   [IQAir] OK
+2026/05/25 10:54:59   [Tomorrow.io] OK
+2026/05/25 10:55:00   [OpenAQ] ERROR: latest measurements: HTTP 422: {"detail":[{"type":"greater_than_equal","loc":["query","locations_id"],"msg":"Input should be greater than or equal to 1","input":0,"ctx":{"ge":1},"url":"https://errors.pydantic.dev/2.11/v/greater_than_equal"}]}
+2026/05/25 10:55:00   [Open-Meteo/CAMS] OK
+2026/05/25 10:55:00 ── Lastarria (-33.4390, -70.6400)
+2026/05/25 10:55:01   [IQAir] OK
+2026/05/25 10:55:01   [Tomorrow.io] OK
+2026/05/25 10:55:01   [OpenAQ] ERROR: latest measurements: HTTP 422: {"detail":[{"type":"greater_than_equal","loc":["query","locations_id"],"msg":"Input should be greater than or equal to 1","input":0,"ctx":{"ge":1},"url":"https://errors.pydantic.dev/2.11/v/greater_than_equal"}]}
+2026/05/25 10:55:01   [Open-Meteo/CAMS] OK
+2026/05/25 10:55:01 Wrote 2 row(s) → data/iqair.csv
+2026/05/25 10:55:01 Wrote 2 row(s) → data/tomorrow.csv
+2026/05/25 10:55:01 Wrote 2 row(s) → data/openmeteo.csv
+2026/05/25 10:55:01 Done.
+2026/05/25 10:57:07 ── Las Condes (-33.4130, -70.5730)
+2026/05/25 10:57:08   [IQAir] OK
+2026/05/25 10:57:08   [Tomorrow.io] OK
+2026/05/25 10:57:09   [OpenAQ] ERROR: locations lookup: HTTP 404: {"detail":"Not Found"}
+2026/05/25 10:57:09   [Open-Meteo/CAMS] OK
+2026/05/25 10:57:09 ── Lastarria (-33.4390, -70.6400)
+2026/05/25 10:57:09   [IQAir] OK
+2026/05/25 10:57:10   [Tomorrow.io] OK
+2026/05/25 10:57:10   [OpenAQ] ERROR: locations lookup: HTTP 404: {"detail":"Not Found"}
+2026/05/25 10:57:10   [Open-Meteo/CAMS] OK
+2026/05/25 10:57:10 Wrote 2 row(s) → data/iqair.csv
+2026/05/25 10:57:10 Wrote 2 row(s) → data/tomorrow.csv
+2026/05/25 10:57:10 Wrote 2 row(s) → data/openmeteo.csv
+2026/05/25 10:57:10 Done.
+2026/05/25 10:57:26 ── Las Condes (-33.4130, -70.5730)
+2026/05/25 10:57:27   [IQAir] OK
+2026/05/25 10:57:27   [Tomorrow.io] OK
+2026/05/25 10:57:27   [OpenAQ] ERROR: locations lookup: HTTP 404: {"detail":"Not Found"}
+2026/05/25 10:57:28   [Open-Meteo/CAMS] OK
+2026/05/25 10:57:28 ── Lastarria (-33.4390, -70.6400)
+2026/05/25 10:57:28   [IQAir] OK
+2026/05/25 10:57:28   [Tomorrow.io] OK
+2026/05/25 10:57:28   [OpenAQ] ERROR: locations lookup: HTTP 404: {"detail":"Not Found"}
+2026/05/25 10:57:28   [Open-Meteo/CAMS] OK
+2026/05/25 10:57:28 Wrote 2 row(s) → data/iqair.csv
+2026/05/25 10:57:28 Wrote 2 row(s) → data/tomorrow.csv
+2026/05/25 10:57:28 Wrote 2 row(s) → data/openmeteo.csv
+2026/05/25 10:57:28 Done.
+2026/05/25 10:58:57 ── Las Condes (-33.4130, -70.5730)
+2026/05/25 10:58:58   [IQAir] OK
+2026/05/25 10:58:58   [Tomorrow.io] OK
+2026/05/25 10:58:58   [OpenAQ] ERROR: locations lookup: HTTP 404: {"detail":"Not Found"}
+2026/05/25 10:58:59   [Open-Meteo/CAMS] OK
+2026/05/25 10:58:59 ── Lastarria (-33.4390, -70.6400)
+2026/05/25 10:58:59   [IQAir] OK
+2026/05/25 10:58:59   [Tomorrow.io] OK
+2026/05/25 10:58:59   [OpenAQ] ERROR: locations lookup: HTTP 404: {"detail":"Not Found"}
+2026/05/25 10:58:59   [Open-Meteo/CAMS] OK
+2026/05/25 10:58:59 Wrote 2 row(s) → data/iqair.csv
+2026/05/25 10:58:59 Wrote 2 row(s) → data/tomorrow.csv
+2026/05/25 10:58:59 Wrote 2 row(s) → data/openmeteo.csv
+2026/05/25 10:58:59 Done.
+2026/05/25 11:06:42 ── Las Condes (-33.4130, -70.5730)
+2026/05/25 11:06:42   [IQAir] OK
+2026/05/25 11:06:43   [Tomorrow.io] OK
+2026/05/25 11:06:43   [OpenAQ] OK
+2026/05/25 11:06:43   [Open-Meteo/CAMS] OK
+2026/05/25 11:06:43 ── Lastarria (-33.4390, -70.6400)
+2026/05/25 11:06:44   [IQAir] OK
+2026/05/25 11:06:44   [Tomorrow.io] OK
+2026/05/25 11:06:44   [OpenAQ] OK
+2026/05/25 11:06:44   [Open-Meteo/CAMS] OK
+2026/05/25 11:06:44 Wrote 2 row(s) → data/iqair.csv
+2026/05/25 11:06:44 Wrote 2 row(s) → data/tomorrow.csv
+2026/05/25 11:06:44 Wrote 2 row(s) → data/openmeteo.csv
+2026/05/25 11:06:44 Wrote 2 row(s) → data/openaq.csv
+2026/05/25 11:06:44 Done.
+2026/05/25 11:08:08 ── Las Condes (-33.4130, -70.5730)
+2026/05/25 11:08:08   [IQAir] OK
+2026/05/25 11:08:09   [Tomorrow.io] OK
+2026/05/25 11:08:09   [OpenAQ] OK
+2026/05/25 11:08:09   [Open-Meteo/CAMS] OK
+2026/05/25 11:08:09 ── Lastarria (-33.4390, -70.6400)
+2026/05/25 11:08:10   [IQAir] OK
+2026/05/25 11:08:10   [Tomorrow.io] OK
+2026/05/25 11:08:10   [OpenAQ] OK
+2026/05/25 11:08:10   [Open-Meteo/CAMS] OK
+2026/05/25 11:08:10 Wrote 2 row(s) → data/iqair.csv
+2026/05/25 11:08:10 Wrote 2 row(s) → data/tomorrow.csv
+2026/05/25 11:08:10 Wrote 2 row(s) → data/openmeteo.csv
+2026/05/25 11:08:10 Wrote 2 row(s) → data/openaq.csv
+2026/05/25 11:08:10 Done.
+2026/05/25 11:18:36 ── Las Condes (-33.4130, -70.5730)
+2026/05/25 11:18:37   [IQAir] OK
+2026/05/25 11:18:37   [Tomorrow.io] OK
+2026/05/25 11:18:37   [OpenAQ] OK
+2026/05/25 11:18:38   [Open-Meteo/CAMS] OK
+2026/05/25 11:18:38 ── Lastarria (-33.4390, -70.6400)
+2026/05/25 11:18:38   [IQAir] OK
+2026/05/25 11:18:38   [Tomorrow.io] OK
+2026/05/25 11:18:38   [OpenAQ] OK
+2026/05/25 11:18:39   [Open-Meteo/CAMS] OK
+2026/05/25 11:18:39 Wrote 2 row(s) → data/iqair.csv
+2026/05/25 11:18:39 Wrote 2 row(s) → data/tomorrow.csv
+2026/05/25 11:18:39 Wrote 2 row(s) → data/openmeteo.csv
+2026/05/25 11:18:39 Wrote 2 row(s) → data/openaq.csv
+2026/05/25 11:18:39 Done.
+2026/05/25 11:21:24 ── Las Condes (-33.4130, -70.5730)
+2026/05/25 11:21:25   [IQAir] OK
+2026/05/25 11:21:25   [Tomorrow.io] OK
+2026/05/25 11:21:25   [OpenAQ] ERROR: no stations found within 25km
+2026/05/25 11:21:26   [Open-Meteo/CAMS] OK
+2026/05/25 11:21:26 ── Lastarria (-33.4390, -70.6400)
+2026/05/25 11:21:26   [IQAir] OK
+2026/05/25 11:21:26   [Tomorrow.io] OK
+2026/05/25 11:21:27   [OpenAQ] ERROR: station found, but data is completely stale
+2026/05/25 11:21:27   [Open-Meteo/CAMS] OK
+2026/05/25 11:21:27 Wrote 2 row(s) → data/iqair.csv
+2026/05/25 11:21:27 Wrote 2 row(s) → data/tomorrow.csv
+2026/05/25 11:21:27 Wrote 2 row(s) → data/openmeteo.csv
+2026/05/25 11:21:27 Done.
+2026/05/25 11:21:36 ── Las Condes (-33.4130, -70.5730)
+2026/05/25 11:21:37   [IQAir] OK
+2026/05/25 11:21:37   [Tomorrow.io] OK
+2026/05/25 11:21:37   [OpenAQ] OK
+2026/05/25 11:21:38   [Open-Meteo/CAMS] OK
+2026/05/25 11:21:38 ── Lastarria (-33.4390, -70.6400)
+2026/05/25 11:21:38   [IQAir] OK
+2026/05/25 11:21:38   [Tomorrow.io] OK
+2026/05/25 11:21:38   [OpenAQ] OK
+2026/05/25 11:21:39   [Open-Meteo/CAMS] OK
+2026/05/25 11:21:39 Wrote 2 row(s) → data/iqair.csv
+2026/05/25 11:21:39 Wrote 2 row(s) → data/tomorrow.csv
+2026/05/25 11:21:39 Wrote 2 row(s) → data/openmeteo.csv
+2026/05/25 11:21:39 Wrote 2 row(s) → data/openaq.csv
+2026/05/25 11:21:39 Done.
+2026/05/25 11:41:56 ── Las Condes (-33.4130, -70.5730)
+2026/05/25 11:41:57   [IQAir] OK
+2026/05/25 11:41:57   [Tomorrow.io] OK
+2026/05/25 11:41:57   [OpenAQ] OK
+2026/05/25 11:41:58   [Open-Meteo/CAMS] OK
+2026/05/25 11:41:58 ── Lastarria (-33.4390, -70.6400)
+2026/05/25 11:41:58   [IQAir] OK
+2026/05/25 11:41:58   [Tomorrow.io] OK
+2026/05/25 11:41:58   [OpenAQ] OK
+2026/05/25 11:41:58   [Open-Meteo/CAMS] OK
+2026/05/25 11:41:58 Wrote 2 row(s) → data/iqair.csv
+2026/05/25 11:41:58 Wrote 2 row(s) → data/tomorrow.csv
+2026/05/25 11:41:58 Wrote 2 row(s) → data/openmeteo.csv
+2026/05/25 11:41:58 Wrote 2 row(s) → data/openaq.csv
+2026/05/25 11:41:58 Done.
+2026/05/25 11:42:14 ── Las Condes (-33.4130, -70.5730)
+2026/05/25 11:42:15   [IQAir] OK
+2026/05/25 11:42:15   [Tomorrow.io] OK
+2026/05/25 11:42:15   [OpenAQ] OK
+2026/05/25 11:42:16   [Open-Meteo/CAMS] OK
+2026/05/25 11:42:16 ── Lastarria (-33.4390, -70.6400)
+2026/05/25 11:42:16   [IQAir] OK
+2026/05/25 11:42:16   [Tomorrow.io] OK
+2026/05/25 11:42:16   [OpenAQ] OK
+2026/05/25 11:42:16   [Open-Meteo/CAMS] OK
+2026/05/25 11:42:16 Wrote 2 row(s) → data/iqair.csv
+2026/05/25 11:42:16 Wrote 2 row(s) → data/tomorrow.csv
+2026/05/25 11:42:16 Wrote 2 row(s) → data/openmeteo.csv
+2026/05/25 11:42:16 Wrote 2 row(s) → data/openaq.csv
+2026/05/25 11:42:16 Done.
