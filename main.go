@@ -1,5 +1,5 @@
-// weather-collector: hybrid Weather & AQI data collector.
-// Sources: IQAir (station), Tomorrow.io (1 km model), Open-Meteo (CAMS baseline).
+// Weather Overground: hybrid Weather & AQI data collector.
+// Sources: IQAir (station), Tomorrow.io (1 km model), OpenAQ (aggregator), Open-Meteo (CAMS baseline).
 // Config: JSON.  Storage: one append-only CSV per source.  No external dependencies.
 package main
 
@@ -602,7 +602,7 @@ func main() {
 	configPath := flag.String("config", "config.json", "Path to JSON config file")
 	flag.Parse()
 
-	logFile, err := os.OpenFile("collector.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	logFile, err := os.OpenFile("overground.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "cannot open log file: %v\n", err)
 		os.Exit(1)
